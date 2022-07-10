@@ -95,7 +95,7 @@ castellatedMeshControls
         (
             { 
                 file "AMI.eMesh";
-                level 1;
+                level 0;
             } 
             { 
                 file "propeller.eMesh"; 
@@ -114,7 +114,7 @@ castellatedMeshControls
         { 
             AMI
                 {
-                    level (0 1); 
+                    level (0 0); 
                     faceType boundary;
                     cellZone rotatingZone;
                     faceZone rotatingZone; 
@@ -143,7 +143,7 @@ castellatedMeshControls
             propeller
             {
                 mode distance;
-                levels ((5e-4 4) (1e-3 3) (5e-3 2) (1e-2 1));
+                levels ((1e-3 4) (5e-3 3) (1e-2 2));
             }
   
         }
