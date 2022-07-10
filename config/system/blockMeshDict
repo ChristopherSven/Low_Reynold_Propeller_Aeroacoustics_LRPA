@@ -16,7 +16,7 @@ FoamFile
 scale 1;
 
 // ======================================== variables ========================================
-cell 120;
+cell 80;
 ER 120;//17; // Expansion ratio of last cell to first cell ratio
 transition_radius 0.8;
 boundary_radius 12;
