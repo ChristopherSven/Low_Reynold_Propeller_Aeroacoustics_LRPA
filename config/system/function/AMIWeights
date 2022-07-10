@@ -1,0 +1,23 @@
+AMIWeights1
+{
+    // Mandatory entries (unmodifiable)
+    type            AMIWeights;
+    libs            (fieldFunctionObjects);
+
+    // Mandatory entries (runtime modifiable)
+    writeFields     true;
+
+    // Optional (inherited) entries
+    writePrecision  8;
+    writeToFile     true;
+    useUserTime     true;
+    region          region0;
+    enabled         true;
+    log             true;
+    timeStart       0;
+    timeEnd         1000;
+    executeControl  timeStep;
+    executeInterval $interval;
+    writeControl    timeStep;
+    writeInterval   $interval;
+}

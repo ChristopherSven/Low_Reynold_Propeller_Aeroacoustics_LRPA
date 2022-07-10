@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+interval 100;
+monitor 10;
+
+application     rhoPimpleFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.1;
+
+deltaT          5e-8;
+
+writeControl    timeStep;
+
+writeInterval   $interval;
+
+purgeWrite      30;
+
+writeFormat     binary;
+
+writePrecision  9;
+
+writeCompression no;
+
+timeFormat      general;
+
+timePrecision   9;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo           0.9;
+
+maxDeltaT       1;
+
+
+functions
+{
+    // // Using
+    //#include "function/surfaces" // interval
+    #include "function/forces"   // monitor
+    //#include "function/fieldAverage" //interval
+    //#include "function/yPlus"   //interval
+    #include "function/AMIWeights"  //interval
+    #include "function/minMax"      //monitor
+   // #include "function/probes"      //monitor
+
+    // // ============ inactive ============ 
+    // #include "function/Q" // Q Criterion
+    // #include "function/vorticity" 
+    // // ============ inactive ============ 
+
+}
+
+// ************************************************************************* //

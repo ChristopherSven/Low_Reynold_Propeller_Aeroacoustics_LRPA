@@ -1,0 +1,47 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2112                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      thermophysicalProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+thermoType
+{   // Thermphysical model (dynamic viscosity, thermal conductivity and thermal diffusivity)
+    type            hePsiThermo;            // Solver dependent
+    mixture         pureMixture;            // Solver dependent
+    transport       const;                  // Dynamic Viscosity  or "sutherland"
+    thermo          hConst;                 // evaluating specific heat Cp
+    equationOfState perfectGas;             // Equation of state of the working fluid \rho = \frac{p}{RT}
+    specie          specie;                 // Solver dependent
+    energy          sensibleInternalEnergy; // Form of energy equation, enthalpy formulation.
+}
+
+mixture // air at room temperature (293 K)
+{
+    specie
+    {
+        molWeight   28.9;                   // Molecular weight
+    }
+    thermodynamics
+    {
+        Cp          1005;                   // Specific heat
+        Hf          0;                      // Heat of formation
+    }
+    transport
+    {
+        mu          1.82e-05;               // Dynamic viscosity
+        Pr          0.71;                   // prandtl number
+    }
+}
+
+
+// ************************************************************************* //

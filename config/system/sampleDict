@@ -1,0 +1,72 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2112                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          sample;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+type            sets;
+libs            (sampling);
+interpolationScheme cellPointFace;
+setFormat       raw;
+fields          ( p U rho pMean); // acoustic div(U)
+
+sets
+(
+    // amiCompare
+    // {
+    //     type cloud;
+    //     ordered true;
+    //     axis xyz;
+
+    //     points
+    //     (
+    //         (0.13145 0 0) // 1.1R
+    //         (0.22705 0 0) // 1.9R
+    //     );
+    // }
+
+    line
+    {
+        type uniform;
+        ordered true;
+        axis x;
+        start (0 0 0);
+        end (0.22705 0 0);
+        nPoints 5000;
+
+    }
+    // zaxis
+    // {
+    //     type uniform;
+    //     ordered true;
+    //     axis z;
+    //     start (0 0 0.239);
+    //     end (0 0 -0.239);
+    //     nPoints 5000;
+
+    // }
+    // xaxis
+    // {
+    //     type uniform;
+    //     ordered true;
+    //     axis x;
+    //     start (-0.239 0 0 );
+    //     end (0.239 0 0);
+    //     nPoints 5000;
+
+    // }
+    
+);
+
+
+// ************************************************************************* //

@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH -J LRRA  #SVEN
+#SBATCH --mail-user=csolsson@connect.ust.hk
+#SBATCH --mail-type=begin
+#SBATCH --mail-type=end
+#SBATCH -p cpu
+
+#SBATCH -N 2 -n 80
+# surfaceFeatureExtract                                               # Meshing
+# blockMesh
+decomposePar #-copyZero
+mpirun -np 80 snappyHexMesh -overwrite -parallel
+mpirun -np 80 createPatch -overwrite -parallel
+mpirun -np 80 checkMesh -parallel -writeSets vtk -allTopology
+#reconstructParMesh -constant                                       # Reconstructed a mesh from a parallel run
+# renumberMesh -overwrite
+# decomposePar                                              # For reconstructed mesh to run in parallel
+# mpirun -np 440 renumberMesh -parallel -overwrite
+# mpirun -np 440 checkMesh -parallel -writeSets vtk -allTopology
+# mpirun -np 440 rhoPimpleFoam -parallel                              # Solving
+# reconstructPar -latestTime
+
+# mpirun -np 40 moveDynamicMesh -checkAMI -parallel
+# rhoPimpleFoam postProcess -func sample -latestTime
+# mpirun -np 400 rhoPimpleFoam -parallel -postProcess -func yPlus
+#mpirun -n 40 rhoPimpleFoam -parallel -postProcess -func AMIWeights

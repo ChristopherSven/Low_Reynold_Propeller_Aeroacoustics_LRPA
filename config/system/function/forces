@@ -1,0 +1,41 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2112                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+forces
+{
+    type            forces;
+    libs            ("libforces.so");
+
+    // Change patch name
+    patches         (propeller); 
+
+    // Write control
+    writeControl        timeStep;
+    writeInterval       $monitor;
+    executeControl      timeStep;
+    executeInterval     $monitor;
+
+    // reference pressure [Pa]
+    pRef          101325;
+
+    // include porosity effects?
+    porosity      no;
+
+    //write volume field representation of force and moments
+    writeFields   no;
+
+    // Don't know
+    log           yes;
+    
+    // Don't know
+    CofR          (0 0 0);    // Rotation around centre line of propeller
+    pitchAxis     (0 0 1);
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,27 @@
+minMax
+{
+    // Mandatory entries (unmodifiable)
+    type        fieldMinMax;
+    libs        (fieldFunctionObjects);
+
+    // Mandatory entries (runtime modifiable)
+    mode        magnitude;
+    fields      (U p T);
+
+    // Optional entries (runtime modifiable)
+    location    false;
+
+    // Optional (inherited) entries
+    writePrecision  8;
+    writeToFile     true;
+    useUserTime     true;
+    // region          region0;
+    enabled         true;
+    log             true;
+    timeStart       0;
+    timeEnd         1000;
+    executeControl  timeStep;
+    executeInterval $monitor;
+    writeControl    timeStep;
+    writeInterval   $monitor;
+}

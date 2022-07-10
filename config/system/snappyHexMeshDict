@@ -1,0 +1,448 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// =================================== GLOBAL SETTING ===================================
+castellatedMesh true;
+snap            true;
+addLayers       false;
+
+// Fraction of overall bounding box of intital mesh, write tolerence needs to be higher.
+mergeTolerance 1e-8;
+
+// Single region surface get patch name according to surface only. Multi-region gets patch name surface "_", default is true [OPTIONAL]
+singleRegionName  true;
+
+// Avoid patch-face merging. Allow mesh for refinement/unrefinement. Default is true
+mergePatchFaces true;
+
+// Presever all generated patches. Default is to remove zero-sized patches (false)
+keepPatches false;
+
+// =================================== GEOMETRY ===================================
+geometry 
+{
+// Specification of input surface on any pure hex mesh, include analytically-defined geometry of searchableSurface class. closed analytical ( searchableBox) or triangulated ( triSurfaceMesh) surfaces.
+
+    AMI.stl{ type triSurfaceMesh; name AMI;}
+    // outlet.stl{ type triSurfaceMesh; name outlet;}
+    propeller.stl{ type triSurfaceMesh; name propeller;}
+
+
+
+}
+
+castellatedMeshControls 
+{   // Mesh level defined relative to starting Hex mesh. levels = (distance  level)
+
+    // Identify a location in final mesh, keep all reachable cells.
+    locationInMesh (0.2 0.2 0.2); 
+
+    // Specify where mesh should be removed
+    // locationsOutsideMesh (0 0 0);
+    
+    // Overall # of ALL cell limits, reinement will stop immediately upon reaching this limit
+    maxGlobalCells 100e6; 
+
+    // ~~~ Parallel running parameter ~~~
+        // Max # on each processor. Refinement <->bweighted balancing
+        maxLocalCells 1e6;
+
+        // Relative difference # of cell per processor
+        maxLoadUnbalance 0.10; 
+    
+    // # of surface cells to be refined is less than or equal to parameter value, the refinement will stop.  
+    minRefinementCells 0; 
+
+    // # Buffer layer between different refinement levels, to reduce disturbance to system. 
+    nCellsBetweenLevels 4; 
+
+    // OPTIONAL increment (on top of max level) in small gaps 
+    // gapLevelIncrement 0;
+
+    // OPTIONAL Remove cells in small gaps
+    // blockLevel 0;
+
+    // OPTIONAL Used to determine if surface normal are roughly same or opposite, default resolveFeatureAngle. Used in prioximity refinement, decide to merge all free-standing baffles (surfaceSimplify), snapping to the wrong side of the thin gap
+    // planarAngle 15;
+
+    // OPTIONAL do not remove cell likely to give snapping problems
+    // handleSnapProblems false;
+
+    // OPTIONAL switch off topological test for cell to be squashed and use geometric test instead
+    // useTopologicalSnapDetection ;
+
+    // OPTIONAL do not refine surface cell with opposite faces of differing refinement levels
+    // interfaceRefine ;
+
+    // OPTIONAL use erosion instead of region assigment to allocate left-over cell to background region. Less chance of bleeding and changing zone for complete region. Specified # of erosioin iter
+    // nCellZoneErodeIter 1;
+
+    // ~~~ Feature dictonary ~~~
+        features 
+        (
+            { 
+                file "AMI.eMesh";
+                level 1;
+            } 
+            { 
+                file "propeller.eMesh"; 
+                level 6;
+                //levels ((0.005 6)(0.05 6));
+            } 
+            // { 
+            //     file "outlet.eMesh"; 
+            //     level 0;
+            // }
+        );
+    
+    // ~~~ refinement Surface dictonary ~~~
+        // Levels min(all cell get refine to) and Max(where angle > resolveFeatureAngle
+        refinementSurfaces 
+        { 
+            AMI
+                {
+                    level (0 1); 
+                    faceType boundary;
+                    cellZone rotatingZone;
+                    faceZone rotatingZone; 
+                    cellZoneInside inside;
+                }
+            propeller
+                {
+                     level (6 6);
+                } 
+            outlet{ level (0 0);
+                    patchInfo
+                    {
+                        type patch;
+                        inGroups (inOutPatch);   
+                    }}
+        }
+        // Refine to max (second level dyad) when angle between local surface normal > parameter value
+        resolveFeatureAngle 30; 
+
+
+    // ~~~ Region refinement ~~~
+        // Region defined by closed anlytical or triangulated surface
+        // modes[inside,outside (ignored level)] [distance (meter level)]
+        refinementRegions 
+        {
+
+  
+        }
+    // ~~~ limite Refinement Region ~~~
+        //  Refinement restricted to region, for feature, refinementSurface or refinementRegion within a given geometric region. Upper level. Does not override nCellBetweenLevels
+        // limitRegions
+            // {
+            //     // NA
+            // }
+
+    // When faceZone is only a boundary to a cellZone but will become a seperate baffle, then must be set true?
+    allowFreeStandingZoneFaces false;
+}
+
+snapControls
+{
+    // Iteration for smoothing mesh to conform to geometry surface
+    nSmoothPatch 1; 
+
+    // Iteration for internal smoothing to reduce non-orthogonality at the face of refinement
+    nSmoothInternal 0; // What is this?
+
+    // Region within local cell edge length * tolerance to be attracted by surface
+    tolerance 4.0;  //GOOD
+
+    // # of overall snapping mesh displacement iter
+    nSolveIter 300; //GOOD
+
+    // iter for removal of bad cell "snapping Relaxation"
+    nRelaxIter 10; // GUESSED
+
+    // ~~~ Feature snapping ~~~
+
+        // # of feature edge snapping iter, default 0.
+        nFeatureSnapIter 20; // GUESSED
+
+        // Create edge on volumetric mesh aligned with feature, avoid non-orthogonaality during layer adding phase
+        nFaceSplitInterval 10; // NEW
+        
+        // Automatic detect feature using $featureAngle, not great with corner and baffles.
+        implicitFeatureSnap false; // GOOD
+
+        // Snap mesh onto eMesh defined in castellation
+        explicitFeatureSnap true; // GOOD
+
+        // Feature between multiple surface will be captured
+        multiRegionFeatureSnap true; // GOOD
+
+        // ~~~ Advance Features ~~~
+
+        // Explicitly detect baffles, default is true 
+        detectBaffles true; // DEFAULT
+
+        // Release attraction close to feature to allwo more freedom for displacement, default is false
+        releasePoints false; //DEFAULT
+
+        // Walk along the feature edge to identify connected feature edge, default is true
+        stringFeatures true; // DEFAULT
+
+        //avoid attraction of points across the diagonal of the face which would result in collapsed face, default is false
+        avoidDiagonal false; // DEFAULT CHANGE ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        // Concave face angle will be spilt, default is 45 degree
+        concaveAngle 45;
+
+        // minAreaRatio ?
+
+        //detectNearSurfacesSnap 
+
+        //baffleFeaturePoints
+
+        // strictRegionSnap
+}
+
+addLayersControls
+{
+// The success of prismatic layer growth depends on the mesh quality after shrinking an existing mesh an creating an infill subject to mesh quality dict
+// To help by setting relaxed in the meshQualityControl dict, the relaxed parameter are used for iteration controlled by nRelaxedIter. 
+
+    layers 
+    {
+        propeller
+        {
+            nSurfaceLayers 5;
+        }
+    }
+
+    // ~~~ Mesh shrinking algorithm ~~~ 
+    // 1. Distance-to-medial surface approximation, result in local mesh distortion
+    // 2. DisplacementMotionSolver meshshrinker for smooth mesh shrinking
+
+    // Use displacementMotionSolver to shrink mesh
+    meshShrinker displacementMotionSolver;
+
+    // Use laplacian for shrinking
+    solver displacementLaplacian;
+
+    displacementLaplacianCoeffs
+    {
+        diffusivity quadratic inverseDistance (propeller);
+    }
+
+    // true undistorted cell layer length, false set to meters that is constant thickness of the layers (igorning local refinement) 
+    relativeSizes false; 
+
+    // Calculate relative size of either first or last layer thickness. Overwrittn by layer refinement?
+    expansionRatio 1.1; 
+
+        // Choose one
+
+            // Relative to undistorted size of cell outside layer, dependent on relativeSize parameter.
+            finalLayerThickness 0.00025;
+
+            // Relative or absolute size
+            //firstLayerThickness 0.0001; // please update minThickness
+
+            // Overall thickness of all cells
+            //thickness 0.5; 
+
+    // Minimum overall thickness of all layers, will collapse layer but protect cell shape and mesh quality    
+    minThickness 0.00025;  //minimum overall layer thickness of all layers
+    
+    // Delay number of layers near features and patches, default 0.
+    nGrow 0; //GOOD
+
+    // ~~~ Advanced settings ~~~
+
+        // To extrude layer, must be smaller then parameter value
+        featureAngle 180; 
+
+        // Slide of points on patch when angle between patch and neighbour > slipFeatureAngle, Default is $featureAngle/2
+        slideFeatureAngle 30; 
+        
+        // Stop layer growth on highly warped cells
+        maxFaceThicknessRatio 0.5;
+
+        // Print face centers with mesh error after adding layers
+        additionalReporting true;
+
+        // Merge faces of a single cell on a patch if angle between individual face < parameter value and forms a single face, helps with layer addition. Default $featureAngle
+        mergePatchFacesAngle 180;
+
+        // Pervent layer extrusion around sharp edges if both faces are not fully extruded, default 0.5*$featureAngle. -180 always attemp
+        // layerTerminationAngle 
+
+        // Limit for co-planar face after merging to become concave, 0 straight 180 fully concave
+        // concaveAngle ;?
+
+        // True to avoid layer extrusion where surrounding points are not extruded
+        // detectExtrusionIsland falsel;
+
+    // ~~~ VERY ADVANCE FEATURES ~~~
+
+        // Patch displacement    
+
+            // Number of smoothing iterations of surface normals, default 1
+            nSmoothSurfaceNormals 10;
+
+            // Smooth layer thickness over surface patches, default 10
+            nSmoothThickness 10;
+
+            // Number of smoothing iterations of interior mesh movement direction
+            nSmoothNormals 15;
+
+        //  Medial axis anslysis
+
+            // minimum Angle used to select medial axis points
+            //minMedialAxisAngle 90; 
+
+            // Reduce layer growth where ratio thickness to medial
+            // distance is large
+            //maxThicknessToMedialRatio 0.3; 
+
+            // Shrinking is driven by distance between two surfaces even when they are far away. Limiting the number of steps walking away from the surface may help to minimise distortion of the mesh. default unlimited
+            // nMedialAxisIter 
+
+            // Smooth displacement of mesh after medial axis is determined, default is o (no smoothing)
+            // nSmoothDisplacement 
+
+        // Mesh shrinking
+
+            //Number of relaxation steps where relaxed mesh quality parameter are used.
+            nRelaxIter 30; 
+
+            // Create buffer region for new layer terminations, default 0. i.e 0 terminate layer in one go.
+            nBufferCellsNoExtrude 0; 
+
+            // Overall max layer addition iteration, will exit when mesh is good or hit lter limit. 
+            nLayerIter 50; //MORE
+
+            // # of iter before relaxed mesh quality control are used, (meshQualityControl-> relaxed)
+            // nRelaxedIter 15; //?
+}
+
+// =================================== MESH QUALITY ===================================
+meshQualityControls
+{
+    // ~~~  Notes ~~~
+    // Mesh quality settting enforced during the snappin and layer addition phase
+    // To ensure resulting mesh is of sufficient quality for subsequent calculation, mostly affecting feature conformance (incur local mesh distortion)
+    // if mesh violates limiting values, it attempts to re-apply change with additional cycles
+    // Mesh quality setting are overrided when $nRelaxedIter has been reached.
+ 
+
+    // #include "meshQualityDict"
+
+
+    // Max face non-orthogonality (degree), between adjacent cell center vector and face normal
+    maxNonOrtho 65;
+
+    // max boundary skewness, default 20
+    maxBoundarySkewness 10;
+
+    // max internal face skewness, default 4
+    maxInternalSkewness 2; 
+
+    // max cell concavity (deg)
+    maxConcave 80;
+
+    // min cell pyramid volume (m cube)
+    minVol -1e30;
+
+    // min tetrahedron quality, large negative for best layer insertion
+    minTetQuality -1e30;
+
+    // Delete single cell with all points on surface if resulting vol after snapping > parameter value * old vol. if <0, delete always
+    minVolCollapseRatio   0.5;
+
+    // min face area (meter square), negative to bypass
+    minArea -1;
+
+    // min twist
+    minTwist 0.01;
+
+    // Min cell determinant
+    minDeterminant 0.001;
+
+    // min face interpolation weight
+    minFaceWeight 0.05;
+
+    // min face flatness, optional
+    // minFaceFlatness -1;
+
+    // Min vol ratio
+    minVolRatio 0.01;
+
+    // Min triangle twist
+    minTriangleTwist -1;
+
+    // smooth iteration,Number of error distribution iterations
+    nSmoothScale 4;
+
+    // Amount to scale back displacement at error points
+    errorReduction 0.75;
+
+
+    // Mesh quality control to be relaxed
+    relaxed
+    {
+        maxNonOrtho 70;
+    }
+
+}
+// =================================== DEBUG ===================================
+debugFlags
+(    
+    // Write intermediate meshes
+    // mesh
+
+    // Write current mesh intersection as .obj files
+    //intersections
+
+    // Write information about explicit feature edge refinement
+    //featureSeeds
+
+    // write attraction as .obj files
+    //attraction
+
+    // write information about layer
+    //layerInfo
+);
+
+
+writeFlags
+(
+    // Write all mesh information
+    // mesh
+
+    // write mesh without refinement information (level0edges, surfaceindex)
+    //noRefinement
+
+    // write volScalarField with cellLevel for post processing
+    scalarLevels
+
+    // write cellSet, faceSe of face in layers
+    //layerSets
+
+    // write volSclarField for layer coverage
+    //layerFields
+ );
+
+// ~~~ RUNNGING ~~~
+// snappyHexMesh -overwrite // suppressed writing mesh to time folder. 
+
+
+// ************************************************************************* //
