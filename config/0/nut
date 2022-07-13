@@ -18,28 +18,29 @@ FoamFile
 
 dimensions      [0 2 -1 0 0 0 0];
 
-internalField   uniform 1e-05;
+internalField   uniform 3.287e-06;
 
 boundaryField
 {
     outlet
     {
-        type            zeroGradient;
+        type            calculated;
+        value           3.287e-06;
     }
     propeller
     {
-        type            nutkWallFunction;
-        value           uniform 1e-05;
+        type            nutUSpaldingWallFunction;
+        value           uniform 3.287e-06;
     }
     AMI1
     {
         type            cyclicAMI;
-        value           uniform 1e-05;
+        value           uniform 3.287e-06;
     }
     AMI2
     {
         type            cyclicAMI;
-        value           uniform 1e-05;
+        value           uniform 3.287e-06;
     }
 }
 
