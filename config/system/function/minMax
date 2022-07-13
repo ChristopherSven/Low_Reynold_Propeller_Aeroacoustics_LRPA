@@ -6,7 +6,7 @@ minMax
 
     // Mandatory entries (runtime modifiable)
     mode        magnitude;
-    fields      (U p T);
+    fields      (U p T nut nuTilda);
 
     // Optional entries (runtime modifiable)
     location    false;

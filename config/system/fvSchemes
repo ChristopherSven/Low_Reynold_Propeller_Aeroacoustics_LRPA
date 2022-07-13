@@ -17,55 +17,86 @@ FoamFile
 ddtSchemes
 {
     default         backward;
-    ddt(phi)        backward;
+    ddt(rho)        backward;
+
+    // Details
+    // default         none;
+    // p               backward;
+    // ddt(p)          backward;
+    // ddt(U)          backward;
+    // ddt(rho)        backward;
+    // ddt(phi)        backward;
+    // ddt(rho,U)      backward;
+    // ddt(rho,e)      backward;
+    // ddt(rho,K)      backward;
+    // ddt(rho,nuTilda)      backward;
+
+    // ddt(thermo:psi,pcorr)   backward;
 }
 
 gradSchemes
 {
     default         Gauss linear;
 
-    limited         cellLimited Gauss linear 1;
-    grad(U)         $limited;
-    grad(k)         $limited;
-    grad(omega)     $limited;
+    // // ===== Default ======
+    // default         none;
+    // limited         cellLimited Gauss linear 1; // what is this?
+    // grad(p)         cellLimited Gauss linear 1;
+    // grad(U)         cellLimited Gauss linear 1;
+    // grad(e)         cellLimited Gauss linear 1;
+    // grad(nut)       cellLimited Gauss linear 1;
+    // grad(pcorr)     cellLimited Gauss linear 1;
+    // grad(nuTilda)   cellLimited Gauss linear 1;
 }
 
 divSchemes
 {
+
     default         none;
 
     div(phi,U)      Gauss linearUpwind limited;
-    //div(phi,U)	    Gauss limitedLinear 1;
-
-    energy          Gauss linearUpwind limited;
-    //energy	    Gauss limitedLinear 1;
-    div(phi,e)      $energy;
-    div(phi,K)      $energy;
-    div(phi,Ekp)    $energy;
+    div(phi,e)      Gauss linearUpwind limited;
+    div(phi,nut)    Gauss linearUpwind limited;
+    div(phi,K)      Gauss linearUpwind limited;
+    div(phi,Ekp)    Gauss linearUpwind limited;
    
     div(meshPhi,p)  Gauss linear;
-    //div(meshPhi,p)  Gauss linear;
 
-    turbulence      Gauss linearUpwind limited;
-    //turbulence      Gauss limitedLinear 1;
-    div(phi,k)      $turbulence;
-    div(phi,omega)  $turbulence;
 
-    div(phiv,p)     Gauss upwind;
-    div((phi|interpolate(rho)),p) Gauss upwind;
+    div(phi,nuTilda)  Gauss linearUpwind limited;
+
+    div(phiv,p)     Gauss linearUpwind limited;
+    div((phi|interpolate(rho)),p) Gauss linearUpwind limited;
 
     div(((rho*nuEff)*dev2(T(grad(U)))))    Gauss linear;
+
 }
 
 laplacianSchemes
 {
     default         Gauss linear corrected;
+
+    // default     none;
+    // laplacian(alphaEff,e)                       Gauss linear corrected;
+    // laplacian(rhorAUf,p)                        Gauss linear corrected;
+    // laplacian(rAUf,pcorr)                       Gauss linear corrected;
+    // laplacian((rho*nuEff),U)                    Gauss linear corrected;
+    // laplacian((rho*DnuTildaEff),nuTilda)        Gauss linear corrected;
+
     laplacian(diffusivity,cellDisplacement) Gauss linear corrected;
 }
 
 interpolationSchemes
 {
     default         linear;
+    // default             none;
+    // interpolate((rho*U))        linear;
+    // interpolate(rho)            linear;
+    // interpolate((rho*(1|A(U)))) linear;
+    // interpolate(((1*(rho_0*U_0))-(2.5e-43*(rho_0_0*U_0_0))))    linear;
+    // dotInterpolate(S,(rho_0*U_0)) linear;
+    // flux(HbyA)                      linear;
+    // interpolate(((2*(rho_0*U_0))-(0.5*(rho_0_0*U_0_0))))    linear;
 }
 
 snGradSchemes

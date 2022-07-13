@@ -23,12 +23,12 @@ boundaryField
     outlet
     {
         type            fixedValue;
-        value           4.686e-5;
+        value           uniform 4.686e-5;
     }
     propeller
     {
         type            fixedValue;
-        value           4.686e-5;
+        value           uniform 4.686e-5;
     }
     AMI1
     {

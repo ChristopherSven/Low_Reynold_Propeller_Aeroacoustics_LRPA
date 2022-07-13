@@ -30,7 +30,7 @@ solvers
         //relTol          0;
     }
 
-    "(rho|U|k|omega|e)"
+    "(rho|U|nut|nuTilda|e)"
     {
         solver          PBiCGStab;
         preconditioner  diagonal;
@@ -38,7 +38,7 @@ solvers
         //relTol          0.001;
     }
 
-    "(rho|U|k|omega|e)Final"
+    "(rho|U|nut|nuTilda|e)Final"
     {
         $U;
         //relTol          0;
@@ -53,19 +53,6 @@ solvers
     }
 }
 
-SIMPLE
-{
-    residualControl
-    {
-        p               1e-4;
-        U               1e-4;
-        "(k|omega|e)"   1e-4;
-    }
-
-    nNonOrthogonalCorrectors 0;
-    // pMinFactor      0.1;
-    // pMaxFactor      2;
-}
 
 PIMPLE
 {
