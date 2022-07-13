@@ -14,19 +14,19 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-limitT
-{
+// limitT
+// {
 
-    type       limitTemperature;
-    min        200;
-    max        400;
-    selectionMode all;
-}
+//     type       limitTemperature;
+//     min        200;
+//     max        400;
+//     selectionMode all;
+// }
 
-velocityDamping
-{
-    type           velocityDampingConstraint;
-    selectionMode  all;
-    UMax           120;
-}
+// velocityDamping
+// {
+//     type           velocityDampingConstraint;
+//     selectionMode  all;
+//     UMax           120;
+// }
 //************************************************************************** //
